@@ -1,0 +1,16 @@
+## Local
+sudo -i
+apt-get update 
+apt-get install zfsutils-linux
+
+### creating pool
+zpool create tiny-pool mirror /dev/sdb /dev/sdc
+zpool add tiny-pool mirror /dev/sdd /dev/sde
+zpool status
+
+### adding dataset
+zfs create -o mountpoint=/mnt/tiny-pool-work tiny-pool/work
+zfs create -o mountpoint=/mnt/tiny-pool-meg tiny-pool/meg
+
+### quota
+zfs set quota=1M tiny-pool/meg

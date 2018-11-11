@@ -1,0 +1,26 @@
+## On Target
+sudo -i
+apt-get -y install tgt
+vim /etc/tgt/conf.d/target01.conf
+systemctl restart tgt
+tgtadm --mode target --op show
+
+### target01.conf
+<target ign.2018-11.com.tutorial:target01>
+	backing-store /dev/sdb
+	initiator-address ALL
+	incominguser user password
+</target>
+
+
+## On Client
+sudo -i
+apt-get install open-iscsi
+iscsiadm -m discovery -t st -p IP_ADDRESS
+iscsiadm -m node --targetname IQN:LUN -p IP_ADDRESS --login # failed login, requries username and password
+iscsiadm -m node --targetname IQN:LUN -p IP_ADDRESS  --op=update --name node.session.auth.authmethod --value=CHAP
+iscsiadm -m node --targetname IQN:LUN -p IP_ADDRESS  --op=update --name node.session.auth.username --value=user
+iscsiadm -m node --targetname IQN:LUN -p IP_ADDRESS  --op=update --name node.session.auth.password --value=password
+iscsiadm -m node --targetname IQN:LUN -p IP_ADDRESS --login
+cd /dev/disk/by-path # ls and a block is there for formatting
+iscsiadm -m node --targetname IQN:LUN -p IP_ADDRESS --logout
